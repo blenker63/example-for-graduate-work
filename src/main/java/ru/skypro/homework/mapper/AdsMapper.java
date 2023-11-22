@@ -17,4 +17,6 @@ public interface AdsMapper {
 @Mapping(source = "user.countAd", target = "count")
 @Mapping(source = "user.adList", target = "results")
     AdsDto toDTO(User user);
+
+    List<AdDto> toDTO(List<Ad> adList);
 }

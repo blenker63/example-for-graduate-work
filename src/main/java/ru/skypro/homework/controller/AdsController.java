@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.dto.AdDto;
 import ru.skypro.homework.dto.AdsDto;
+import ru.skypro.homework.dto.CreateOrUpdateAdDto;
 import ru.skypro.homework.service.AdService;
 
 @Slf4j
@@ -19,25 +22,25 @@ import ru.skypro.homework.service.AdService;
 
 @RequestMapping("/ads")
 public class AdsController {
-//    private final AdService adService;
+    private final AdService adService;
 
 
 
-    @Operation(
-            summary = "Получение всех объявлений",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK"
-                    )
-            }
-    )
-    @GetMapping("")
-    public ResponseEntity<AdsDto> getAllAds() {
-        return ResponseEntity.ok().build();
 
-//        return new ResponseEntity <> (adService.getAll(), HttpStatus.OK);
-    }
+//    @Operation(
+//            summary = "Получение всех объявлений",
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "OK"
+//                    )
+//            }
+//    )
+//    @GetMapping("")
+//    public ResponseEntity<AdsDto> getAllAds(@RequestBody Authentication authentication) {
+//        return ResponseEntity.ok(adService.getAllAds(authentication));
+//
+//    }
 
     @Operation(
             summary = "Добавление объявления",
@@ -52,9 +55,10 @@ public class AdsController {
                     )
             }
     )
-    @PostMapping("")
-    public ResponseEntity<?> addAds() {
-        return ResponseEntity.ok().build();
+    @PostMapping()
+    public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
+                                                     Authentication authentication) {
+        return ResponseEntity.ok(adService.addAd(createOrUpdateAdDto, authentication));
     }
 
     @Operation(

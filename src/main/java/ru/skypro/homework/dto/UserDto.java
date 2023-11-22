@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 @Getter
 @ToString
 @AllArgsConstructor
+@Data
 @Schema(description = "Пользователь")
 public class UserDto {
 

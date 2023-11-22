@@ -10,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @ToString
 @AllArgsConstructor
+@Data
 @Schema(description = "Объявление")
 public class AdDto {
 

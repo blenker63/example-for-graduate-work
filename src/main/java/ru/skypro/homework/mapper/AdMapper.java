@@ -4,14 +4,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.skypro.homework.dto.AdDto;
+import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.User;
 
 import java.util.List;
 
+
 @Mapper
 public interface AdMapper {
     AdMapper INSTANCE = Mappers.getMapper(AdMapper.class);
+
     @Mapping(source = "user.id", target = "author")
     @Mapping(source = "ad.adImage", target = "image")
     @Mapping(target = "ad.description", ignore = true)
@@ -20,7 +23,11 @@ public interface AdMapper {
     AdDto toDto(Ad ad, User user);
 //    @Mapping(target = "id", source = "adDto.author")
 //    User toModel(AdDto adDto);
+//CreateOrUpdateAdMapper INSTANCE = Mappers.getMapper(CreateOrUpdateAdMapper.class);
     @Mapping(target = "adImage", source = "adDto.image")
+//    @Mapping(target = "countAd", source = "adDto.countAd")
+//    @Mapping(target = "user_id", source = "adDto.user_id")
+
     Ad toModel(AdDto adDto);
 
 }
