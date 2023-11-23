@@ -7,20 +7,33 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.AdDto;
 import ru.skypro.homework.dto.AdsDto;
+import ru.skypro.homework.dto.CreateOrUpdateAdDto;
+import ru.skypro.homework.dto.ExtendedAdDto;
 import ru.skypro.homework.service.AdService;
+
+import javax.validation.Valid;
+
+import static org.hibernate.boot.model.process.spi.MetadataBuildingProcess.build;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @Tag(name = "Объявления", description = "контроллер для работы с объявлениями")
 @RestController
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 
 @RequestMapping("/ads")
 public class AdsController {
-//    private final AdService adService;
+    private final AdService adService;
 
+    public AdsController(AdService adService) {
+        this.adService = adService;
+    }
 
 
     @Operation(
@@ -36,7 +49,6 @@ public class AdsController {
     public ResponseEntity<AdsDto> getAllAds() {
         return ResponseEntity.ok().build();
 
-//        return new ResponseEntity <> (adService.getAll(), HttpStatus.OK);
     }
 
     @Operation(
@@ -53,8 +65,9 @@ public class AdsController {
             }
     )
     @PostMapping("")
-    public ResponseEntity<?> addAds() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
+                                                     Authentication authentication) {
+        return ResponseEntity.ok(adService.addAds(createOrUpdateAdDto, authentication));
     }
 
     @Operation(
@@ -75,8 +88,8 @@ public class AdsController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAds() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ExtendedAdDto> getAds(@PathVariable int id) {
+        return ResponseEntity.ok(adService.getAds(id));
     }
 
     @Operation(
@@ -101,7 +114,8 @@ public class AdsController {
             }
     )
     @DeleteMapping ("/remove/{id}")
-    public ResponseEntity<?> removeAd() {
+    public ResponseEntity<AdDto> removeAd(@PathVariable int id) {
+        adService.removeAd(id);
         return ResponseEntity.ok().build();
     }
 
@@ -127,8 +141,10 @@ public class AdsController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAds() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CreateOrUpdateAdDto> updateAds(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
+                                                         Authentication authentication,
+                                                         @PathVariable int id) {
+        return ResponseEntity.ok(adService.updateAds(createOrUpdateAdDto, authentication, id));
     }
 
     @Operation(
