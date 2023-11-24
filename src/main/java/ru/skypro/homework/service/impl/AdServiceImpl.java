@@ -44,47 +44,28 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public List<AdDto> getAllAds(Authentication authentication) {
-//        User user = userServiceImpl.findUserByUsername(authentication);
-////        List<Ad> adList = adRepository.findAdByUser(user);
-//        List<Ad> adList = adRepository.findAll();
-//        AdsDto adsDto = new AdsDto();
-//        adsDto.setCount(adList.size());
-//        adsDto.setResults(adsMapper.INSTANCE.toDto(adList));
-//        return adsDto;
-//        return null;
-        User user = userServiceImpl.findUserByUsername(authentication);
-//        List<Ad> adList = adRepository.findAdByUser(user);
+    public AdsDto getAllAds() {
         List<Ad> adList = adRepository.findAll();
         AdsDto adsDto = new AdsDto();
-//        adsDto.setCount(adList.size());
-        //adsDto.setResults(adsMapper.INSTANCE.toDto(adList.size(), adList));
-//        adsDto.setResults(AdsMapper.INSTANCE.toDto(adList));
-        return adsDto.getResults();
+        adsDto.setCount(adList.size());
+        adsDto.setResults(AdsMapper.INSTANCE.toDto(adList));
+        return adsDto;
     }
 
 @Override
     public ExtendedAdDto getAds(int pk){
-//    Ad ad = AdMapper.INSTANCE.toModel(pk);
     Ad ad = adRepository.findByPk(pk);
-//    User userId = ad.getUser(UserMapper.INSTANCE.toModel());
-//    User userId = adRepository.findByPk(pk).getUser();
-//    User user = userRepository.findById(userId);
     User user = userRepository.findById(adRepository.findByPk(pk).getUser());
-//        return extendedAdMapper.INSTANCE.toDto(ad);
         return ExtendedAdMapper.INSTANCE.toDto(ad, user);
 }
 @Override
     public void removeAd(int pk) {
-//        Ad ad = adRepository.findByPk(pk);
         adRepository.deleteById(pk);
-//        return adRepository.deleteById(pk);
 }
     @Override
     public CreateOrUpdateAdDto updateAds(CreateOrUpdateAdDto createOrUpdateAdDto, Authentication authentication, int pk) {
         User user = userServiceImpl.findUserByUsername(authentication);
         Ad ad = CreateOrUpdateAdMapper.INSTANCE.toModel(createOrUpdateAdDto);
-//        ad.setUser(user);
         Ad newAd = adRepository.getReferenceById(pk);
         newAd.setTitle(ad.getTitle());
         newAd.setPrice(ad.getPrice());
@@ -95,7 +76,6 @@ public class AdServiceImpl implements AdService {
     @Override
     public AdsDto getAdsMe(Authentication authentication) {
         User user = userServiceImpl.findUserByUsername(authentication);
-//        List<Ad> adMeList = AdsMapper.INSTANCE.toDto(adRepository.findAdByUser(user));
         List<Ad> adMeList = adRepository.findAdByUser(user);
         AdsDto adsDto = new AdsDto();
         adsDto.setCount(adMeList.size());
