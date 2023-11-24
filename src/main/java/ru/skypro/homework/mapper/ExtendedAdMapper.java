@@ -24,4 +24,5 @@ public interface ExtendedAdMapper {
 
 //    ExtendedAdDto toDto(Ad ad);
     ExtendedAdDto toDto(Ad ad, User user);
+//    ExtendedAdDto toDto(Ad ad);
 }
