@@ -39,7 +39,7 @@ public class AdsController {
     )
     @GetMapping("")
     public ResponseEntity<AdsDto> getAllAds() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(adService.getAllAds());
 
     }
 

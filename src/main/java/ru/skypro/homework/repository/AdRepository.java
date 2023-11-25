@@ -18,7 +18,6 @@ public interface AdRepository extends JpaRepository<Ad, Integer> {
 
     Optional<Ad> findById(Long adId);
 
-
 //    void deleteById(int pk);
 
 //    Ad findAdByUser_Id(int pk);
