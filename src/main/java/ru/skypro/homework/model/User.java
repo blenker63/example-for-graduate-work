@@ -29,5 +29,9 @@ public class User {
     private String password;
     private int countAd;
     @Transient
+    @OneToMany(mappedBy = "user")
     private List<Ad> adList;
+    @Transient
+    @OneToMany(mappedBy = "user")
+    private List<Comment> commentList;
 }

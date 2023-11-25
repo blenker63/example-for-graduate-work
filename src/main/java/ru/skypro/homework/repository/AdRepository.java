@@ -6,6 +6,7 @@ import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AdRepository extends JpaRepository<Ad, Integer> {
@@ -15,6 +16,7 @@ public interface AdRepository extends JpaRepository<Ad, Integer> {
 
     List<Ad> findById(int userIdAd);
 
+    Optional<Ad> findById(Long adId);
 
 
 //    void deleteById(int pk);

@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.model.User;
+
 @Service
 public interface UserService {
 
@@ -16,5 +18,6 @@ public interface UserService {
     UserDto getUserDto(Authentication authentication);
 
     String updateImage(MultipartFile image, Authentication authentication);
+    User findUserByUsername(Authentication authentication);
 
 }
