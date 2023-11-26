@@ -15,7 +15,6 @@ public interface NewPasswordMapper {
 //    @Mapping(source = "user.newPassword", target = "newPassword")
     NewPasswordDto toDto(User user);
 
-//    @Mapping(source = "currentPassword", target = "user.currentPassword")
     @Mapping(source = "newPasswordDto.newPassword", target = "password")
     User toModel(NewPasswordDto newPasswordDto);
     @InheritConfiguration

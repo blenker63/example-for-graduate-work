@@ -14,7 +14,7 @@ public interface AdRepository extends JpaRepository<Ad, Integer> {
 
     Ad findByPk(int pk);
 
-    List<Ad> findById(int userIdAd);
+//    List<Ad> findById(int userIdAd);
 
     Optional<Ad> findById(Long adId);
 

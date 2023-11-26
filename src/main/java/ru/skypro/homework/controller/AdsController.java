@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,8 @@ import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.dto.CreateOrUpdateAdDto;
 import ru.skypro.homework.dto.ExtendedAdDto;
 import ru.skypro.homework.service.AdService;
+
+import javax.servlet.UnavailableException;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -56,7 +59,7 @@ public class AdsController {
                     )
             }
     )
-    @PostMapping("")
+    @PostMapping()
     public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
                                                      Authentication authentication) {
         return ResponseEntity.ok(adService.addAds(createOrUpdateAdDto, authentication));
@@ -81,7 +84,7 @@ public class AdsController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAdDto> getAds(@PathVariable int id) {
-        return ResponseEntity.ok(adService.getAds(id));
+        return new ResponseEntity<>(adService.getAds(id), HttpStatus.OK);
     }
 
     @Operation(
@@ -106,8 +109,9 @@ public class AdsController {
             }
     )
     @DeleteMapping ("/remove/{id}")
-    public ResponseEntity<AdDto> removeAd(@PathVariable int id) {
-        adService.removeAd(id);
+    public ResponseEntity<AdDto> removeAd(@PathVariable int id,
+                                          Authentication authentication) throws UnavailableException {
+        adService.removeAd(id,authentication);
         return ResponseEntity.ok().build();
     }
 
@@ -135,7 +139,7 @@ public class AdsController {
     @PatchMapping("/{id}")
     public ResponseEntity<CreateOrUpdateAdDto> updateAds(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
                                                          Authentication authentication,
-                                                         @PathVariable int id) {
+                                                         @PathVariable int id) throws UnavailableException {
         return ResponseEntity.ok(adService.updateAds(createOrUpdateAdDto, authentication, id));
     }
 
