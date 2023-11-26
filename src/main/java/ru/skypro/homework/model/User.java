@@ -36,6 +36,6 @@ public class User  {
     private String password;
     private int countAd;
 
-//    @Transient
-//    private List<Ad> adList;
+    @Transient
+    private List<Ad> adList;
 }
