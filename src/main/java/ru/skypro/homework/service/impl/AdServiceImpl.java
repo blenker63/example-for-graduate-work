@@ -77,9 +77,11 @@ public class AdServiceImpl implements AdService {
     public AdsDto getAdsMe(Authentication authentication) {
         User user = userServiceImpl.findUserByUsername(authentication);
         List<Ad> adMeList = adRepository.findAdByUser(user);
+        System.out.println(adMeList);
         AdsDto adsDto = new AdsDto();
         adsDto.setCount(adMeList.size());
         adsDto.setResults(AdsMapper.INSTANCE.toDto(adMeList));
+        System.out.println(adsDto);
         return adsDto;
     }
 

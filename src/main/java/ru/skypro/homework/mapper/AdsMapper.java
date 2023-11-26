@@ -9,9 +9,14 @@ import ru.skypro.homework.model.User;
 
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+//@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+//@Mapper(componentModel = "spring")
+@Mapper(uses = AdsMapper.class)
 public interface AdsMapper {
     AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
-    @Mapping(target = "author", source = "ad.user_id")
+    @Mapping(target = "author", source = "user.id")
+    AdDto toDtoAd(Ad ad);
+
+    @Mapping(target = "author", source = "user.id")
     List<AdDto> toDto(List<Ad> adMeList);
 }
