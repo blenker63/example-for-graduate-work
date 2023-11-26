@@ -9,8 +9,6 @@ import ru.skypro.homework.model.User;
 
 import java.util.List;
 
-//@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-//@Mapper(componentModel = "spring")
 @Mapper(uses = AdsMapper.class)
 public interface AdsMapper {
     AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);

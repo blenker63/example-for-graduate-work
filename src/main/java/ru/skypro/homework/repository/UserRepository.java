@@ -2,6 +2,7 @@ package ru.skypro.homework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.User;
 
 import java.util.Optional;
@@ -11,6 +12,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByUserName(String username);
 
-    User findById(User userId);
+    User findById(int userId);
+//    User findById(User userId);
+//    Ad findByU(User userId);
 
 }

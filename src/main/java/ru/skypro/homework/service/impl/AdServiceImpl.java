@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.AdDto;
 import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.dto.CreateOrUpdateAdDto;
 import ru.skypro.homework.dto.ExtendedAdDto;
@@ -18,20 +17,15 @@ import ru.skypro.homework.service.AdService;
 import java.util.List;
 
 
+
 @Service
-//@Data
 @AllArgsConstructor
 @Slf4j
-//@RequiredArgsConstructor
 
 public class AdServiceImpl implements AdService {
     private AdRepository adRepository;
     private final UserRepository userRepository;
     private final UserServiceImpl userServiceImpl;
-//    private final ExtendedAdMapper extendedAdMapper;
-//    private final AdMapper adMapper;
-//    private final AdsMapper adsMapper;
-//    private final User user;
 
 
     @Override
@@ -55,7 +49,10 @@ public class AdServiceImpl implements AdService {
 @Override
     public ExtendedAdDto getAds(int pk){
     Ad ad = adRepository.findByPk(pk);
-    User user = userRepository.findById(adRepository.findByPk(pk).getUser());
+    System.out.println(ad);
+    int userId = adRepository.findByPk(pk).getUser().getId();
+    User user = userRepository.findById(userId);
+    System.out.println(user);
         return ExtendedAdMapper.INSTANCE.toDto(ad, user);
 }
 @Override

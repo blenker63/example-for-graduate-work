@@ -14,7 +14,4 @@ public interface UserMapper {
     @Mapping(target = "user.adList", ignore = true)
 
     UserDto toDto(User user);
-
-//    @Mapping(target = "id", source = "adDto.Author")
-//    User toModel(AdDto adDto);
 }

@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @ToString
 @EqualsAndHashCode
-//@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Ads")

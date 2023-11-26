@@ -10,7 +10,6 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-//@RequiredArgsConstructor
 @EqualsAndHashCode
 @Schema(description = "список объявлений")
 public class AdsDto {
