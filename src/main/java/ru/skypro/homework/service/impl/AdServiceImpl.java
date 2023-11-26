@@ -50,8 +50,8 @@ public class AdServiceImpl implements AdService {
     public ExtendedAdDto getAds(int pk){
     Ad ad = adRepository.findByPk(pk);
     System.out.println(ad);
-    int userId = adRepository.findByPk(pk).getUser().getId();
-    User user = userRepository.findById(userId);
+    User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
+
     System.out.println(user);
         return ExtendedAdMapper.INSTANCE.toDto(ad, user);
 }
@@ -74,11 +74,9 @@ public class AdServiceImpl implements AdService {
     public AdsDto getAdsMe(Authentication authentication) {
         User user = userServiceImpl.findUserByUsername(authentication);
         List<Ad> adMeList = adRepository.findAdByUser(user);
-        System.out.println(adMeList);
         AdsDto adsDto = new AdsDto();
         adsDto.setCount(adMeList.size());
         adsDto.setResults(AdsMapper.INSTANCE.toDto(adMeList));
-        System.out.println(adsDto);
         return adsDto;
     }
 
