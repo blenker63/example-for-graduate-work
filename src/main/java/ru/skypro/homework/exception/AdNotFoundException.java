@@ -1,5 +1,6 @@
 package ru.skypro.homework.exception;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 

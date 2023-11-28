@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface AdRepository extends JpaRepository<Ad, Integer> {
     List<Ad> findAdByUser(User user);
 
-    Ad findByPk(int pk);
+    Optional<Ad> findByPk(int pk);
 
 //    List<Ad> findById(int userIdAd);
 
