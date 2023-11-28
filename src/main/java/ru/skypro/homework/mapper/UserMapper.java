@@ -12,8 +12,6 @@ import ru.skypro.homework.model.User;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     @Mapping(target = "user.adList", ignore = true)
-    UserDto toDto(User user);
 
-//    @Mapping(target = "id", source = "adDto.Author")
-//    User toModel(AdDto adDto);
+    UserDto toDto(User user);
 }
