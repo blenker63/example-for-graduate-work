@@ -4,18 +4,20 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.AdDto;
 import ru.skypro.homework.dto.RegisterDto;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.User;
-
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RegisterMapper {
-    @Mapping(source = "userName", target = "user.userName")
-    @Mapping(source = "password", target = "user.password")
-    @Mapping(source = "firstName", target = "user.firstName")
-    @Mapping(source = "lastName", target = "user.lastName")
-    @Mapping(source = "phone", target = "user.phone")
-    @Mapping(source = "role", target = "user.role")
+    RegisterMapper INSTANCE = Mappers.getMapper(RegisterMapper.class);
+    @Mapping(source = "registerDto.username", target = "userName")
+    @Mapping(source = "registerDto.password", target = "password")
+    @Mapping(source = "registerDto.firstName", target = "firstName")
+    @Mapping(source = "registerDto.lastName", target = "lastName")
+    @Mapping(source = "registerDto.phone", target = "phone")
+    @Mapping(source = "registerDto.role", target = "role")
+    @Mapping(source = "registerDto.username", target = "email")
     User toModel(RegisterDto registerDto);
 }

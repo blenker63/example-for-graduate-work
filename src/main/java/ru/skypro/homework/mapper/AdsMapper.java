@@ -1,8 +1,6 @@
 package ru.skypro.homework.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import ru.skypro.homework.dto.AdDto;
 import ru.skypro.homework.dto.AdsDto;
@@ -11,10 +9,12 @@ import ru.skypro.homework.model.User;
 
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = AdsMapper.class)
 public interface AdsMapper {
     AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
-@Mapping(source = "user.countAd", target = "count")
-@Mapping(source = "user.adList", target = "result")
-    AdsDto toDTO(User user);
+    @Mapping(target = "author", source = "user.id")
+    AdDto toDtoAd(Ad ad);
+
+    @Mapping(target = "author", source = "user.id")
+    List<AdDto> toDto(List<Ad> adMeList);
 }

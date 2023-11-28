@@ -8,7 +8,7 @@ import java.util.List;
 @Setter
 @Getter
 @ToString
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Schema(description = "список комментариев")
 public class CommentsDto {
 
@@ -17,5 +17,6 @@ public class CommentsDto {
 
     @Schema(description = "комментарии")
     private List<CommentDto> results;
+
 
 }

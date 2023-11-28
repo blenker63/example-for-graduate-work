@@ -1,16 +1,27 @@
 package ru.skypro.homework.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Data
-@Table(name = "Пользователь")
-public class User {
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+//@RequiredArgsConstructor
+@Table(name = "Users")
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,5 +36,9 @@ public class User {
     private String password;
     private int countAd;
     @Transient
+    @OneToMany(mappedBy = "user")
     private List<Ad> adList;
+    @Transient
+    @OneToMany(mappedBy = "user")
+    private List<Comment> commentList;
 }

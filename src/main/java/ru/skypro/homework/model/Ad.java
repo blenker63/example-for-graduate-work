@@ -1,17 +1,22 @@
 package ru.skypro.homework.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
-@Table(name = "Объявления")
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "Ads")
 public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long pk;
+    private int pk;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -22,4 +27,5 @@ public class Ad {
     private int countComment;
     @Transient
     private List<Comment> commentList;
+
 }
