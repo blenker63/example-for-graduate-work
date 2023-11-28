@@ -138,17 +138,17 @@ public class AdServiceImpl implements AdService {
             logger.warn("не найдено объявление id=" + pk);
             throw new AdNotFoundException(pk);
         }
-        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
+//        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
             newAd.setTitle(ad.getTitle());
             newAd.setPrice(ad.getPrice());
             newAd.setDescription(ad.getDescription());
             logger.info("внесены изменения в объявление id=" + ad.getPk(), ad);
             adRepository.save(newAd);
             return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
-        } else {
-            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
-            throw new UnavailableException(user.getFirstName(), user.getId());
-        }
+//        } else {
+//            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
+//            throw new UnavailableException(user.getFirstName(), user.getId());
+//        }
     }
 
     /**
