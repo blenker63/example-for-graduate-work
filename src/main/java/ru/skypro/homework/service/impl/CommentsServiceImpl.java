@@ -50,19 +50,21 @@ public class CommentsServiceImpl implements CommentsService {
 //        Ad ad = adRepository.findByPk(adId).
 //                orElseThrow(()-> new AdNotFoundException("объявление не найдено"));
         Ad ad = adRepository.findByPk(pk);
-        System.out.println(ad);
+//        System.out.println("выбрано объявление - " + ad);
         if (ad == null) {
             logger.warn("объявление id =" + pk + " не найдено");
             throw new AdNotFoundException(pk);
         }
         User user = userService.findUserByUsername(authentication);
+        Comment textComment = CreateOrUpdateCommentMapper.INSTANCE.toModel(updateCommentDto);
         Comment comment = new Comment();
         comment.setAd(ad);
         comment.setUser(user);
-        comment.setText(updateCommentDto.getText());
+        comment.setText(String.valueOf(textComment));
+//        comment.setText(updateCommentDto.getText());
         comment.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
         commentsRepository.save(comment);
-        log.info("комментарий успешно добален");
+        log.info("комментарий успешно добавлен");
 
         return CommentMapper.INSTANCE.toDto(comment, user);
     }

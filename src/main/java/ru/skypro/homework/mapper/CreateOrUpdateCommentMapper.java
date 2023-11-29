@@ -13,11 +13,10 @@ import ru.skypro.homework.model.User;
 public interface CreateOrUpdateCommentMapper {
     CreateOrUpdateCommentMapper INSTANCE = Mappers.getMapper(CreateOrUpdateCommentMapper.class);
 
-    @Mapping(target = "text", source = "comment.text")
+//    @Mapping(target = "text", source = "text")
     CreateOrUpdateCommentDto toDto(Comment comment);
-//    CreateOrUpdateCommentDto toDto(Comment comment, User user);
 
-    @Mapping(target = "text", source = "createOrUpdateCommentDto.text")
+    @Mapping(target = "text", source = "text")
     Comment toModel(CreateOrUpdateCommentDto createOrUpdateCommentDto);
 
 

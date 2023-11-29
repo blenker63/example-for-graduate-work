@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,6 +31,7 @@ import javax.validation.Valid;
 @CrossOrigin(value = "http://localhost:3000")
 @Tag(name = "Объявления", description = "контроллер для работы с объявлениями")
 @RestController
+@JsonIgnoreProperties(ignoreUnknown = true)
 //@AllArgsConstructor
 //@RequiredArgsConstructor
 @RequestMapping("/ads")
@@ -312,16 +314,21 @@ public class AdsController {
                     )
             }
     )
-    @PostMapping("/{id}/comments")
-//public ResponseEntity<CommentDto> addComment(@RequestBody CreateOrUpdateCommentDto createOrUpdateCommentDto,
-//                                             @PathVariable int id,
-//                                             Authentication authentication) {
+    @PostMapping(value = "/{id}/comments", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    @PostMapping(value = "/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PostMapping( "/{id}/comments")
     public ResponseEntity<CommentDto> addComment(Authentication authentication,
-                                                 @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "текст комментария")
-                                                 @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
+//                                                 @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "текст комментария")
+//                                                 @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
+                                                 @RequestBody CreateOrUpdateCommentDto createOrUpdateCommentDto,
                                                  @PathVariable int id) {
+//    @PostMapping("/{id}/comments")
+//    public ResponseEntity<CommentDto> addComment(@RequestBody CreateOrUpdateCommentDto createOrUpdateCommentDto,
+//                                                 @PathVariable int id,
+//                                                 Authentication authentication) {
         return ResponseEntity.ok(commentsService.addComment(createOrUpdateCommentDto, id, authentication));
     }
+
 
     @Operation(
             summary = "Удаление комментария",
