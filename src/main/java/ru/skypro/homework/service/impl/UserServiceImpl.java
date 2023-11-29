@@ -29,7 +29,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
+/**
+ * Класс реализация интерфейса {@link UserService} и {@link UserDetailsService}
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -48,6 +50,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Редактирование данных пользователя
      * {@link UpdateUserMapper#toModel(UpdateUserDto, User)}
+     *
      * @return {@link UserRepository#save(Object)},
      */
     @Override
@@ -59,10 +62,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return UpdateUserMapper.INSTANCE.toDTO(user);
 
     }
+
     /**
      * Изменение пароля пользователя
      * {@link PasswordEncoder#encode(CharSequence)}
      * {@link NewPasswordMapper#toDto(User)},
+     *
      * @return {@link UserRepository#save(Object)},
      * @throws PasswordChangeException пароль не изменен
      */
@@ -80,8 +85,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new PasswordChangeException("ошибка изменения пароля");
         }
     }
+
     /**
      * Предоставление информации о зарегистрированном пользователе
+     *
      * @return {@link UserMapper#toDto(User)},
      */
     @Override
@@ -90,9 +97,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("пользователь найден");
         return UserMapper.INSTANCE.toDto(user);
     }
+
     /**
      * Обновление аватарки пользователя
      * {@link User#setUserImage(String)}
+
+
+
+
+
      */
     @Override
     public void updateImage(MultipartFile image, Authentication authentication, String userName) {
@@ -115,15 +128,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
 
+
 //        user.setUserImage(image.getName());
 //        log.info("изображение обновлено");
 //        return "изображение обновлено";
 //    }
+
+
     /**
      * Проверка авторизации пользователя в базе
      * {@link UserRepository#findByUserName(String)}
-     * @throws UsernameNotFoundException пользователь не найден
+     *
      * @return {@link MyUserPrincipal}
+     * @throws UsernameNotFoundException пользователь не найден
      */
     @Override
     @Transactional
@@ -133,10 +150,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                         String.format("Пользователь '%s' не найден", username)));
         return new MyUserPrincipal(user);
     }
+
     /**
      * Проверка авторизованного пользователя в базе
-     * @throws UsernameNotFoundException пользователь не найден
+     *
      * @return {@link UserRepository#findByUserName(String)}
+     * @throws UsernameNotFoundException пользователь не найден
      */
     public User findUserByUsername(Authentication authentication) {
         return userRepository.findByUserName(authentication.getName())
