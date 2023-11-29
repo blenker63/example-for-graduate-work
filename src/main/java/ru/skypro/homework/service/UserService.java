@@ -17,7 +17,10 @@ public interface UserService {
 
     UserDto getUserDto(Authentication authentication);
 
-    String updateImage(MultipartFile image, Authentication authentication);
+    void updateImage(MultipartFile image, Authentication authentication, String userName);
+
     User findUserByUsername(Authentication authentication);
+
+    byte[] getUserImage(String filename);
 
 }

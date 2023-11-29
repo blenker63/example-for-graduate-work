@@ -293,7 +293,7 @@ public class AdServiceImpl implements AdService {
         try {
             return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + filePath + "/" + filename));
         } catch (IOException e) {
-            logger.error("произошла ошибка при попытке прочитать изображение для объявления " + filename);
+            logger.error("ошибка в названии image объявления " + filename);
             throw new RuntimeException(e);
         }
     }
