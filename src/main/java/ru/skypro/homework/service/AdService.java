@@ -13,8 +13,11 @@ import java.util.List;
 
 @Service
 public interface AdService {
-//    CreateOrUpdateAdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, Authentication authentication);
-    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, Authentication authentication, String userName);
+    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image,
+                               Authentication authentication,  String userName);
+//    CreateOrUpdateAdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image,
+//                               Authentication authentication,  String userName);
+//    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, Authentication authentication, String userName);
 //    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, String userName);
     CreateOrUpdateAdDto updateAds(CreateOrUpdateAdDto createOrUpdateAdDto, Authentication authentication, int pk) throws UnavailableException;
     AdsDto getAllAds();

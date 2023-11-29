@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.CommentsService;
@@ -81,13 +84,17 @@ public class AdsController {
             }
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
-    public ResponseEntity<AdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto createOrUpdateAdDto,
+    public ResponseEntity<AdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto properties,
+//    public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto properties,
+//    public ResponseEntity<AdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto createOrUpdateAdDto,
                                        Authentication authentication,
-                                       @RequestPart(required = false) MultipartFile image) {
+                                       @RequestParam MultipartFile image) {
+//                                       @RequestPart(required = false) MultipartFile image) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
-        return ResponseEntity.ok(adService.addAds(createOrUpdateAdDto, image, authentication, userName));
+        return ResponseEntity.ok(adService.addAds(properties, image, authentication, userName));
+//        return ResponseEntity.ok(adService.addAds(properties, image, authentication, userName));
+//        return ResponseEntity.ok(adService.addAds(createOrUpdateAdDto, image, authentication, userName));
     }
 
     @Operation(
@@ -175,10 +182,12 @@ public class AdsController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<CreateOrUpdateAdDto> updateAds(@RequestBody CreateOrUpdateAdDto createOrUpdateAdDto,
+    public ResponseEntity<CreateOrUpdateAdDto> updateAds(@RequestBody @Valid CreateOrUpdateAdDto properties,
+//    public ResponseEntity<CreateOrUpdateAdDto> updateAds(@RequestBody @Valid CreateOrUpdateAdDto createOrUpdateAdDto,
                                                          Authentication authentication,
                                                          @PathVariable int id) throws UnavailableException {
-        return ResponseEntity.ok(adService.updateAds(createOrUpdateAdDto, authentication, id));
+        return ResponseEntity.ok(adService.updateAds(properties, authentication, id));
+//        return ResponseEntity.ok(adService.updateAds(createOrUpdateAdDto, authentication, id));
     }
 
     @Operation(
@@ -385,5 +394,12 @@ public class AdsController {
 
         return ResponseEntity.ok(commentsService.updateComment(createOrUpdateCommentDto, id, commentId, authentication));
     }
+//    @Configuration
+//    class WebMvcConfig implements WebMvcConfigurer {
+//        @Override
+//        public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+//            configurer.defaultContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        }
+//    }
 
 }
