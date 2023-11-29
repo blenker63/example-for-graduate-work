@@ -1,12 +1,15 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
@@ -95,7 +98,12 @@ public class UsersController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "OK"
+                            description = "OK",
+                            content = {
+                                    @Content(
+                                            mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE
+                                    )
+                            }
                     ),
                     @ApiResponse(
                             responseCode = "401",
@@ -103,12 +111,23 @@ public class UsersController {
                     ),
             }
     )
-    @PatchMapping("/me/image")
-    public ResponseEntity<String> updateUserImage(MultipartFile image, Authentication authentication) {
-        log.info("запрос на добаление аватара");
+    @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateUserImage(@RequestParam MultipartFile image, Authentication authentication) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        log.info("запрос на добавление аватара");
+        userService.updateImage(image, authentication, userName);
 
-        return ResponseEntity.ok(userService.updateImage(image, authentication));
+        return ResponseEntity.ok().build();
     }
 
+    @GetMapping(value = "/get/{filename}",
+            produces = {MediaType.IMAGE_PNG_VALUE,
+                    MediaType.IMAGE_JPEG_VALUE,
+                    MediaType.IMAGE_GIF_VALUE,
+                    "image/*"})
+    public ResponseEntity<byte[]> serveFile(@PathVariable String filename) {
+        return ResponseEntity.ok().body(userService.getUserImage(filename));
+    }
 
 }

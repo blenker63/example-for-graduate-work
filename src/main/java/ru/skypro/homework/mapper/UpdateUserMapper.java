@@ -16,6 +16,5 @@ public interface UpdateUserMapper {
 
 
     User toModel(UpdateUserDto updateUserDto, @MappingTarget User user);
-
     UpdateUserDto toDTO(User user);
 }

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
@@ -22,6 +23,11 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.security.MyUserPrincipal;
 import ru.skypro.homework.service.UserService;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Класс реализация интерфейса {@link UserService} и {@link UserDetailsService}
@@ -32,6 +38,14 @@ import ru.skypro.homework.service.UserService;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+
+
+//
+//    @Getter
+//    @Value("${file.path.avatar}")
+//    private String filePath;
+
+
 
     /**
      * Редактирование данных пользователя
@@ -87,16 +101,39 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Обновление аватарки пользователя
      * {@link User#setUserImage(String)}
-     *
-     * @return {@link String},
+
+
+
+
+
      */
     @Override
-    public String updateImage(MultipartFile image, Authentication authentication) {
+    public void updateImage(MultipartFile image, Authentication authentication, String userName) {
         User user = findUserByUsername(authentication);
-        user.setUserImage(image.getName());
-        log.info("изображение обновлено");
-        return "изображение обновлено";
+//        String dir = System.getProperty("user.dir") + "/" + filePath;
+        String dir = System.getProperty("user.dir") + "/" + "file.path.avatar";
+        try {
+            Files.createDirectories(Path.of(dir));
+            String fileName = String.format("avatar%s.%s", user.getEmail(),
+                    StringUtils.getFilenameExtension(image.getOriginalFilename()));
+            image.transferTo(new File(dir + "/" + fileName));
+            user.setUserImage("/users/get/" + fileName);
+            log.info("изображение " + fileName + " для аватара пользователя, сохранено на сервере", image);
+        } catch (IOException e) {
+            log.error("произошла ошибка при попытке сохранить изображение " + image.getOriginalFilename() + ", для аватара пользователя " + userName + ", на сервер", image);
+            throw new RuntimeException(e);
+        }
+        userRepository.save(user);
     }
+
+
+
+
+//        user.setUserImage(image.getName());
+//        log.info("изображение обновлено");
+//        return "изображение обновлено";
+//    }
+
 
     /**
      * Проверка авторизации пользователя в базе
@@ -125,5 +162,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь '%s' не найден", authentication.getName())));
 
+    }
+    @Override
+    public byte[] getUserImage(String filename) {
+        try {
+            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + "file.path.avatar" + "/" + filename));
+//            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + getFilePath() + "/" + filename));
+        } catch (IOException e) {
+            log.error("ошибка в названии image Аватара" + filename);
+            throw new RuntimeException(e);
+        }
     }
 }

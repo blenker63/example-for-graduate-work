@@ -14,6 +14,6 @@ import javax.validation.constraints.Size;
 public class CreateOrUpdateCommentDto {
     @Schema(description = "текст комментария")
     @NotBlank
-    @Size(min = 4, max = 32)
+    @Size(min = 8, max = 64)
     private String  text;
 }
