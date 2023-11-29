@@ -15,16 +15,13 @@ import java.util.List;
 public interface AdService {
     AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image,
                                Authentication authentication,  String userName);
-//    CreateOrUpdateAdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image,
-//                               Authentication authentication,  String userName);
-//    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, Authentication authentication, String userName);
-//    AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,  MultipartFile image, String userName);
     CreateOrUpdateAdDto updateAds(CreateOrUpdateAdDto createOrUpdateAdDto, Authentication authentication, int pk) throws UnavailableException;
     AdsDto getAllAds();
     ExtendedAdDto getAds(int pk);
     AdsDto getAdsMe(Authentication authentication);
     void removeAd(int pk, Authentication authentication) throws UnavailableException;
-    void uploadImage(int id, Authentication authentication, MultipartFile image);
+//    void uploadImage(int id, Authentication authentication, MultipartFile image);
+    void uploadImage(int id, Authentication authentication, MultipartFile image, String userName);
 
     byte[] getAdImage(String filename);
 

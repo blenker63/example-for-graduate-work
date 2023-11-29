@@ -13,6 +13,7 @@ import java.util.List;
 public interface AdsMapper {
     AdsMapper INSTANCE = Mappers.getMapper(AdsMapper.class);
     @Mapping(target = "author", source = "user.id")
+    @Mapping(target = "image", source = "adImage")
     AdDto toDtoAd(Ad ad);
 
     @Mapping(target = "author", source = "user.id")

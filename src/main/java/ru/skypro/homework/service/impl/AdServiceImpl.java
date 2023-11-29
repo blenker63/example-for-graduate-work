@@ -24,6 +24,7 @@ import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
+import ru.skypro.homework.service.CommentsService;
 
 import javax.servlet.UnavailableException;
 import java.io.File;
@@ -46,6 +47,7 @@ public class AdServiceImpl implements AdService {
     private AdRepository adRepository;
     private final UserRepository userRepository;
     private final UserServiceImpl userServiceImpl;
+//    private final CommentsService commentsService;
 
     @Value("${file.path.image}")
     private String filePath;
@@ -54,6 +56,7 @@ public class AdServiceImpl implements AdService {
         this.adRepository = adRepository;
         this.userRepository = userRepository;
         this.userServiceImpl = userServiceImpl;
+//        this.commentsService = commentsService;
     }
 
 
@@ -66,7 +69,6 @@ public class AdServiceImpl implements AdService {
      * @return AdDto
      */
     @Override
-//    public CreateOrUpdateAdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,
     public AdDto addAds(CreateOrUpdateAdDto createOrUpdateAdDto,
                         MultipartFile image,
                         Authentication authentication,
@@ -108,7 +110,7 @@ public class AdServiceImpl implements AdService {
         Ad ad = adRepository.findByPk(pk);
         if (ad != null) {
             User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
-            logger.info("найдено объявление: " + ad, ad);
+            logger.info("найдено объявление: " + ad);
             return ExtendedAdMapper.INSTANCE.toDto(ad, user);
         }
         throw new AdNotFoundException(pk);
@@ -129,12 +131,14 @@ public class AdServiceImpl implements AdService {
             throw new AdNotFoundException(pk);
         }
         if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
-//        try {
-//            Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath + ad.getImage().replaceAll("/ads/get", "")));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        commentService.deleteAllCommentByPk(pk);
+            if (ad.getAdImage() != null) {
+                try {
+                    Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath + ad.getAdImage().replaceAll("/ads/get", "")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+//        commentsService.deleteAllCommentByPk(pk);
             adRepository.deleteById(pk);
             logger.info("удалено объявление id = " + ad.getPk(), ad);
         } else {
@@ -158,14 +162,14 @@ public class AdServiceImpl implements AdService {
         Ad ad = CreateOrUpdateAdMapper.INSTANCE.toModel(createOrUpdateAdDto);
         Ad newAd = adRepository.getReferenceById(pk);
         if (ad == null) {
-            logger.warn("не найдено объявление id=" + pk);
+            logger.warn("не найдено объявление id =" + pk);
             throw new AdNotFoundException(pk);
         }
 //        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
             newAd.setTitle(ad.getTitle());
             newAd.setPrice(ad.getPrice());
             newAd.setDescription(ad.getDescription());
-            logger.info("внесены изменения в объявление id=" + ad.getPk(), ad);
+            logger.info("внесены изменения в объявление id =" + ad.getPk(), ad);
             adRepository.save(newAd);
             return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
 //        } else {
@@ -200,20 +204,24 @@ public class AdServiceImpl implements AdService {
      * @param image     файл изображения для объявления
      */
     @Override
-    public void uploadImage(int pk, Authentication authentication, MultipartFile image) {
+    public void uploadImage(int pk, Authentication authentication, MultipartFile image, String userName) {
+//    public void uploadImage(int pk, Authentication authentication, MultipartFile image) {
         User user = userServiceImpl.findUserByUsername(authentication);
         Ad ad = adRepository.findByPk(pk);
         if (ad == null) {
             logger.warn("не найдено объявление id = " + pk);
             throw new AdNotFoundException(pk);
         }
-        try {
-            Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath + ad.getAdImage().replaceAll("/ads/get", "")));
-        } catch (IOException e) {
-            logger.error("произошла ошибка при попытке удаления изображения к объявлению id=" + id, ad);
-            throw new RuntimeException(e);
+        if (ad.getAdImage() != null) {
+            try {
+                Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath + ad.getAdImage().replaceAll("/ads/get", "")));
+            } catch (IOException e) {
+                logger.error("произошла ошибка при попытке удаления изображения к объявлению id=" + id, ad);
+                throw new RuntimeException(e);
+            }
         }
-        String imageName = uploadImageOnSystem(image, user.getUserName());
+        String imageName = uploadImageOnSystem(image, userName);
+//        String imageName = uploadImageOnSystem(image, user.getUserName());
         ad.setAdImage(getUrlImage(imageName));
         ad.setUser(user);
         adRepository.save(ad);
@@ -274,7 +282,7 @@ public class AdServiceImpl implements AdService {
     }
 
     /**
-     * Метод получчает массив байтов
+     * Метод получает массив байтов
      *
      * @param filename имя картинки
      * @return byte[]
@@ -285,7 +293,7 @@ public class AdServiceImpl implements AdService {
         try {
             return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + filePath + "/" + filename));
         } catch (IOException e) {
-            logger.error("произошла ошибка при попытке прочитать изображение для объявления" + filename);
+            logger.error("произошла ошибка при попытке прочитать изображение для объявления " + filename);
             throw new RuntimeException(e);
         }
     }

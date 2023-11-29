@@ -85,16 +85,11 @@ public class AdsController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto properties,
-//    public ResponseEntity<CreateOrUpdateAdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto properties,
-//    public ResponseEntity<AdDto> addAd(@RequestPart @Valid CreateOrUpdateAdDto createOrUpdateAdDto,
                                        Authentication authentication,
                                        @RequestParam MultipartFile image) {
-//                                       @RequestPart(required = false) MultipartFile image) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
         return ResponseEntity.ok(adService.addAds(properties, image, authentication, userName));
-//        return ResponseEntity.ok(adService.addAds(properties, image, authentication, userName));
-//        return ResponseEntity.ok(adService.addAds(createOrUpdateAdDto, image, authentication, userName));
     }
 
     @Operation(
@@ -280,7 +275,10 @@ public class AdsController {
     public ResponseEntity<String> updateImage(@PathVariable int id,
                                               Authentication authentication,
                                               @RequestParam MultipartFile image) {
-        adService.uploadImage(id, authentication, image);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+//        adService.uploadImage(id, authentication, image);
+        adService.uploadImage(id, authentication, image, userName );
         return ResponseEntity.ok().build();
     }
 
