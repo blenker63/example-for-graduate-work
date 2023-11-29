@@ -7,6 +7,7 @@ import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,31 +34,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 import static ru.skypro.homework.dto.Role.ADMIN;
 
-//@AllArgsConstructor
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class AdServiceImpl implements AdService {
     private final Logger logger = LoggerFactory.getLogger(AdServiceImpl.class);
-    private AdRepository adRepository;
+    private final AdRepository adRepository;
     private final UserRepository userRepository;
     private final UserServiceImpl userServiceImpl;
-//    private final CommentsService commentsService;
 
     @Value("${file.path.image}")
     private String filePath;
 
-    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, UserServiceImpl userServiceImpl) {
-        this.adRepository = adRepository;
-        this.userRepository = userRepository;
-        this.userServiceImpl = userServiceImpl;
-//        this.commentsService = commentsService;
-    }
+//    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, UserServiceImpl userServiceImpl) {
+//        this.adRepository = adRepository;
+//        this.userRepository = userRepository;
+//        this.userServiceImpl = userServiceImpl;
+//
+//    }
 
 
     /**
@@ -107,13 +107,16 @@ public class AdServiceImpl implements AdService {
      */
     @Override
     public ExtendedAdDto getAds(int pk) {
-        Ad ad = adRepository.findByPk(pk);
-        if (ad != null) {
-            User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
-            logger.info("найдено объявление: " + ad);
-            return ExtendedAdMapper.INSTANCE.toDto(ad, user);
-        }
-        throw new AdNotFoundException(pk);
+        Ad ad = adRepository.findByPk(pk).orElseThrow(() -> new AdNotFoundException(pk));
+        User user = userRepository.findById(ad.getUser().getId());
+        logger.info("найдено объявление: " + ad, ad);
+        return ExtendedAdMapper.INSTANCE.toDto(ad, user);
+//        if (ad != null) {
+//            User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
+//            logger.info("найдено объявление: " + ad, ad);
+//            return ExtendedAdMapper.INSTANCE.toDto(ad, user);
+//        }
+//        throw new AdNotFoundException(pk);
     }
 
     /**
@@ -125,11 +128,11 @@ public class AdServiceImpl implements AdService {
     @Override
     public void removeAd(int pk, Authentication authentication) throws UnavailableException {
         User user = userServiceImpl.findUserByUsername(authentication);
-        Ad ad = adRepository.findByPk(pk);
-        if (ad == null) {
-            logger.warn("объявление id =" + pk + " не найдено");
-            throw new AdNotFoundException(pk);
-        }
+        Ad ad = adRepository.findByPk(pk).orElseThrow(() -> new AdNotFoundException(pk));
+//        if (ad == null) {
+//            logger.warn("объявление id =" + pk + " не найдено");
+//            throw new AdNotFoundException(pk);
+//        }
         if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
             if (ad.getAdImage() != null) {
                 try {
@@ -207,7 +210,7 @@ public class AdServiceImpl implements AdService {
     public void uploadImage(int pk, Authentication authentication, MultipartFile image, String userName) {
 //    public void uploadImage(int pk, Authentication authentication, MultipartFile image) {
         User user = userServiceImpl.findUserByUsername(authentication);
-        Ad ad = adRepository.findByPk(pk);
+        Ad ad = adRepository.findByPk(pk).orElseThrow();
         if (ad == null) {
             logger.warn("не найдено объявление id = " + pk);
             throw new AdNotFoundException(pk);

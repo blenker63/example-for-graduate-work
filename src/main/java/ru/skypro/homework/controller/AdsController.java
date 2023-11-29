@@ -144,7 +144,7 @@ public class AdsController {
             }
     )
 
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<AdDto> removeAd(@PathVariable int id,
                                           Authentication authentication) throws UnavailableException {
         adService.removeAd(id, authentication);
@@ -314,7 +314,7 @@ public class AdsController {
                     )
             }
     )
-    @PostMapping(value = "/{id}/comments", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/{id}/comments")
 //    @PostMapping(value = "/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    @PostMapping( "/{id}/comments")
     public ResponseEntity<CommentDto> addComment(Authentication authentication,

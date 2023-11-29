@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Getter
 @ToString
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Schema(description = "сохранение и обновление комментария")
 public class CreateOrUpdateCommentDto {
     @Schema(description = "текст комментария")

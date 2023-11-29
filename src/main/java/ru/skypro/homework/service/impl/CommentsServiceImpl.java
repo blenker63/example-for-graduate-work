@@ -38,37 +38,38 @@ import java.util.List;
 @Slf4j
 public class CommentsServiceImpl implements CommentsService {
     private final Logger logger = LoggerFactory.getLogger(AdServiceImpl.class);
-    UserService userService;
-    AdService adService;
-    AdRepository adRepository;
-    CommentsRepository commentsRepository;
+    private final UserService userService;
+    private final AdService adService;
+    private final AdRepository adRepository;
+    private final CommentsRepository commentsRepository;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     * Добавление комментария к объявлению по первичному ключу объявления
+    /**
+     * Добавление комментария
+     * к объявлению
+     * по первичному
+     * ключу объявления
      *
-     * @param updateCommentDto сущность для добавления
-     * @param adId             идентификатор объявления
+     * @param updateCommentDto сущность
+     *                         для добавления
+     * @param adId             идентификатор
+     *                         объявления
      * @param authentication   аутентификация
-     *                         {@link CommentsRepository#save(Object)} сохранение в репозитории
-     * @return {@link CommentMapper#toDto(Comment, User)}
-     * @throws AdNotFoundException объявление не найдено
+     *                         <p>
+     *                         <p>
+     *                         {
+     * @return {
+     * @throws AdNotFoundException объявление
+     *                             не найдено
+     * @link CommentsRepository#save(Object)
+     * }
+     * <p>
+     * сохранение в
+     * репозитории
+     * @link CommentMapper#toDto(Comment, User)
+     * }
      */
+
     @Override
     public CommentDto addComment(CreateOrUpdateCommentDto updateCommentDto, int adId, Authentication authentication) {
         Ad ad = adRepository.findByPk(adId).
@@ -79,8 +80,8 @@ public class CommentsServiceImpl implements CommentsService {
         Comment comment = new Comment();
         comment.setAd(ad);
         comment.setUser(user);
-        comment.setText(String.valueOf(textComment));
-//        comment.setText(updateCommentDto.getText());
+        //comment.setText(String.valueOf(textComment));
+        comment.setText(updateCommentDto.getText());
         comment.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
         commentsRepository.save(comment);
         log.info("комментарий успешно добавлен");
@@ -88,24 +89,8 @@ public class CommentsServiceImpl implements CommentsService {
         return CommentMapper.INSTANCE.toDto(comment, user);
     }
 
-   
 
-
-
-
-
-      
-
-
-
-
-
-
-
-
-
-
-
+    /**
      * Получение всех комментариев объявления
      *
      * @param adId идентификатор объявления
@@ -128,12 +113,7 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
 
-
-
-
-
-
-
+    /**
      * Удаление комментария объявления
      *
      * @param adId      идентификатор объявления
@@ -142,7 +122,6 @@ public class CommentsServiceImpl implements CommentsService {
      *                  {@link CommentsRepository#findByAd_PkAndPk(int, int)} поиск комментария
      * @throws NoRightsException        нет прав для удаления
      * @throws CommentNotFoundException комментарий не найден
-
      */
     @Override
     public void removeComment(int adId, int commentId, Authentication authentication) {
@@ -189,7 +168,6 @@ public class CommentsServiceImpl implements CommentsService {
      * @param authentication аутентификация
      *                       <p>
      *                       {@link CommentsRepository#findByPk(int)} поиск комментария
-
      * @throws CommentNotFoundException комментарий не найден
      */
     private boolean checkUserRole(int commentId, Authentication authentication) {

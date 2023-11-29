@@ -18,5 +18,8 @@ public interface CommentsMapper {
     CommentsMapper INSTANCE = Mappers.getMapper(CommentsMapper.class);
     @Mapping(source = "ad.countComment", target = "count")
     @Mapping(source = "ad.commentList", target = "results")
+    @Mapping(source = "ad.pk", target = "author")
+    @Mapping(source = "ad.pk", target = "author")
+    @Mapping(source = "ad.pk", target = "author")
     List<CommentDto> toDTO(List<Comment> comments);
 }
