@@ -48,6 +48,7 @@ public class AdServiceImpl implements AdService {
     private final AdRepository adRepository;
     private final UserRepository userRepository;
     private final UserServiceImpl userServiceImpl;
+    private final CommentsService commentsService;
 
     @Value("${file.path.image}")
     private String filePath;
@@ -119,37 +120,6 @@ public class AdServiceImpl implements AdService {
 //        throw new AdNotFoundException(pk);
     }
 
-    /**
-     * Метод удаляет объявление(может удалять Admin или создатель объявления)
-     *
-     * @param pk id объявления
-     *           //     * @param userName login пользователя
-     */
-    @Override
-    public void removeAd(int pk, Authentication authentication) throws UnavailableException {
-        User user = userServiceImpl.findUserByUsername(authentication);
-        Ad ad = adRepository.findByPk(pk).orElseThrow(() -> new AdNotFoundException(pk));
-//        if (ad == null) {
-//            logger.warn("объявление id =" + pk + " не найдено");
-//            throw new AdNotFoundException(pk);
-//        }
-        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
-            if (ad.getAdImage() != null) {
-                try {
-                    Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath + ad.getAdImage().replaceAll("/ads/get", "")));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-//        commentsService.deleteAllCommentByPk(pk);
-            adRepository.deleteById(pk);
-            logger.info("удалено объявление id = " + ad.getPk(), ad);
-        } else {
-            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
-            throw new UnavailableException(user.getFirstName(), user.getId());
-        }
-//    adRepository.deleteById(pk);
-    }
 
     /**
      * Метод обновляет объявление
@@ -169,12 +139,12 @@ public class AdServiceImpl implements AdService {
             throw new AdNotFoundException(pk);
         }
 //        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
-            newAd.setTitle(ad.getTitle());
-            newAd.setPrice(ad.getPrice());
-            newAd.setDescription(ad.getDescription());
-            logger.info("внесены изменения в объявление id =" + ad.getPk(), ad);
-            adRepository.save(newAd);
-            return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
+        newAd.setTitle(ad.getTitle());
+        newAd.setPrice(ad.getPrice());
+        newAd.setDescription(ad.getDescription());
+        logger.info("внесены изменения в объявление id =" + ad.getPk(), ad);
+        adRepository.save(newAd);
+        return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
 //        } else {
 //            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
 //            throw new UnavailableException(user.getFirstName(), user.getId());
@@ -190,7 +160,7 @@ public class AdServiceImpl implements AdService {
     public AdsDto getAdsMe(Authentication authentication) {
         User user = userServiceImpl.findUserByUsername(authentication);
         List<Ad> adMeList = adRepository.findAdByUser(user);
-            AdsDto adsDto = new AdsDto();
+        AdsDto adsDto = new AdsDto();
         if (adMeList == null) {
             throw new UserNotAdFoundException(user.getId());
         } else {
@@ -198,13 +168,48 @@ public class AdServiceImpl implements AdService {
             adsDto.setResults(AdsMapper.INSTANCE.toDto(adMeList));
             logger.warn("выведены объявления авторизованного пользователя c id " + user.getId());
         }
-            return adsDto;
+        return adsDto;
     }
+
+
+    /**
+     * Метод удаляет объявление(может удалять Admin или создатель объявления)
+     *
+     * @param pk id объявления
+     *           //     * @param userName login пользователя
+     */
+    @Override
+    public void removeAd(int pk, Authentication authentication) throws UnavailableException {
+        User user = userServiceImpl.findUserByUsername(authentication);
+        Ad ad = adRepository.findByPk(pk).orElseThrow(() -> new AdNotFoundException(pk));
+//        if (ad == null) {
+//            logger.warn("объявление id =" + pk + " не найдено");
+//            throw new AdNotFoundException(pk);
+//        }
+        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
+            if (ad.getAdImage() != null) {
+                try {
+
+                    Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath
+                            + ad.getAdImage().replaceAll("/ads/get", "")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            commentsService.deleteAllCommentByPk(pk);
+            adRepository.delete(ad);
+            logger.info("удалено объявление id = " + pk);
+        } else {
+            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
+            throw new UnavailableException(user.getFirstName(), user.getId());
+        }
+    }
+
     /**
      * Метод обновления картинки по объявлению
      *
-     * @param pk        уникальный идентификатор объявления
-     * @param image     файл изображения для объявления
+     * @param pk    уникальный идентификатор объявления
+     * @param image файл изображения для объявления
      */
     @Override
     public void uploadImage(int pk, Authentication authentication, MultipartFile image, String userName) {
@@ -265,7 +270,7 @@ public class AdServiceImpl implements AdService {
     /**
      * Метод загружаем файл
      *
-     * @param image     файл
+     * @param image файл
      * @return String имя загруженного файла
      */
 //    private String uploadImageOnSystem(MultipartFile image, Authentication authentication) {
