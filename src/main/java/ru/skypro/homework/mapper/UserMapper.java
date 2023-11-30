@@ -12,6 +12,6 @@ import ru.skypro.homework.model.User;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     @Mapping(target = "user.adList", ignore = true)
-
+    @Mapping(target = "image", source = "userImage")
     UserDto toDto(User user);
 }

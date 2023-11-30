@@ -9,11 +9,11 @@ import javax.validation.constraints.Size;
 @Setter
 @Getter
 @ToString
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Schema(description = "сохранение и обновление комментария")
 public class CreateOrUpdateCommentDto {
     @Schema(description = "текст комментария")
     @NotBlank
-    @Size(min = 4, max = 32)
+    @Size(min = 8, max = 64)
     private String  text;
 }

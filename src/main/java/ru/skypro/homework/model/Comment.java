@@ -18,7 +18,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.REMOVE)
     @JoinColumn(name = "ad_id")
     private Ad ad;
     private long createdAt;

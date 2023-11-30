@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
@@ -22,8 +23,15 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.security.MyUserPrincipal;
 import ru.skypro.homework.service.UserService;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-
+/**
+ * Класс реализация интерфейса {@link UserService} и {@link UserDetailsService}
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -31,9 +39,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
 
+
+//
+//    @Getter
+//    @Value("${file.path.avatar}")
+//    private String filePath;
+
+
+
     /**
-     * Редиктирование данных пользователя
+     * Редактирование данных пользователя
      * {@link UpdateUserMapper#toModel(UpdateUserDto, User)}
+     *
      * @return {@link UserRepository#save(Object)},
      */
     @Override
@@ -45,10 +62,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return UpdateUserMapper.INSTANCE.toDTO(user);
 
     }
+
     /**
      * Изменение пароля пользователя
      * {@link PasswordEncoder#encode(CharSequence)}
      * {@link NewPasswordMapper#toDto(User)},
+     *
      * @return {@link UserRepository#save(Object)},
      * @throws PasswordChangeException пароль не изменен
      */
@@ -66,8 +85,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new PasswordChangeException("ошибка изменения пароля");
         }
     }
+
     /**
      * Предоставление информации о зарегистрированном пользователе
+     *
      * @return {@link UserMapper#toDto(User)},
      */
     @Override
@@ -76,23 +97,50 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("пользователь найден");
         return UserMapper.INSTANCE.toDto(user);
     }
+
     /**
      * Обновление аватарки пользователя
      * {@link User#setUserImage(String)}
-     * @return {@link String},
+
+
+
+
+
      */
     @Override
-    public String updateImage(MultipartFile image, Authentication authentication) {
+    public void updateImage(MultipartFile image, Authentication authentication, String userName) {
         User user = findUserByUsername(authentication);
-        user.setUserImage(image.getName());
-        log.info("изображение обновлено");
-        return "изображение обновлено";
+//        String dir = System.getProperty("user.dir") + "/" + filePath;
+        String dir = System.getProperty("user.dir") + "/" + "file.path.avatar";
+        try {
+            Files.createDirectories(Path.of(dir));
+            String fileName = String.format("avatar%s.%s", user.getEmail(),
+                    StringUtils.getFilenameExtension(image.getOriginalFilename()));
+            image.transferTo(new File(dir + "/" + fileName));
+            user.setUserImage("/users/get/" + fileName);
+            log.info("изображение " + fileName + " для аватара пользователя, сохранено на сервере", image);
+        } catch (IOException e) {
+            log.error("произошла ошибка при попытке сохранить изображение " + image.getOriginalFilename() + ", для аватара пользователя " + userName + ", на сервер", image);
+            throw new RuntimeException(e);
+        }
+        userRepository.save(user);
     }
+
+
+
+
+//        user.setUserImage(image.getName());
+//        log.info("изображение обновлено");
+//        return "изображение обновлено";
+//    }
+
+
     /**
      * Проверка авторизации пользователя в базе
      * {@link UserRepository#findByUserName(String)}
-     * @throws UsernameNotFoundException пользователь не найден
+     *
      * @return {@link MyUserPrincipal}
+     * @throws UsernameNotFoundException пользователь не найден
      */
     @Override
     @Transactional
@@ -102,15 +150,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                         String.format("Пользователь '%s' не найден", username)));
         return new MyUserPrincipal(user);
     }
+
     /**
      * Проверка авторизованного пользователя в базе
-     * @throws UsernameNotFoundException пользователь не найден
+     *
      * @return {@link UserRepository#findByUserName(String)}
+     * @throws UsernameNotFoundException пользователь не найден
      */
     public User findUserByUsername(Authentication authentication) {
         return userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь '%s' не найден", authentication.getName())));
 
+    }
+    @Override
+    public byte[] getUserImage(String filename) {
+        try {
+            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + "file.path.avatar" + "/" + filename));
+//            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + getFilePath() + "/" + filename));
+        } catch (IOException e) {
+            log.error("ошибка в названии image Аватара" + filename);
+            throw new RuntimeException(e);
+        }
     }
 }

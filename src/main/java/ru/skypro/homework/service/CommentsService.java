@@ -6,14 +6,14 @@ import ru.skypro.homework.dto.CommentsDto;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDto;
 import ru.skypro.homework.model.Comment;
 
-import java.util.List;
-
 public interface CommentsService {
-    CommentDto addComment(CreateOrUpdateCommentDto updateCommentDto, int adId, Authentication authentication);
+   CommentDto addComment(CreateOrUpdateCommentDto createOrUpdateCommentDto, int pk, Authentication authentication);
 
-    CommentsDto getComments(int AdId);
+    CommentsDto getComments(int pk);
 
     void removeComment(int adId, int commentId, Authentication authentication);
-    CreateOrUpdateCommentDto updateComment(CreateOrUpdateCommentDto updateCommentDto, int adId, int commentId, Authentication authentication);
+    CreateOrUpdateCommentDto updateComment(CreateOrUpdateCommentDto updateCommentDto, int adId,
+                                           int commentId,  Authentication authentication);
+    void deleteAllCommentByPk(int pk);
 
 }
