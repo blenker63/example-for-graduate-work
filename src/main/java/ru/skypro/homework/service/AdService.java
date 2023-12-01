@@ -20,7 +20,6 @@ public interface AdService {
     ExtendedAdDto getAds(int pk);
     AdsDto getAdsMe(Authentication authentication);
     void removeAd(int pk, Authentication authentication) throws UnavailableException;
-//    void uploadImage(int id, Authentication authentication, MultipartFile image);
     void uploadImage(int id, Authentication authentication, MultipartFile image, String userName);
 
     byte[] getAdImage(String filename);

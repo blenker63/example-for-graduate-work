@@ -109,12 +109,6 @@ public class AdServiceImpl implements AdService {
         User user = userRepository.findById(ad.getUser().getId());
         logger.info("найдено объявление: " + ad, ad);
         return ExtendedAdMapper.INSTANCE.toDto(ad, user);
-//        if (ad != null) {
-//            User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
-//            logger.info("найдено объявление: " + ad, ad);
-//            return ExtendedAdMapper.INSTANCE.toDto(ad, user);
-//        }
-//        throw new AdNotFoundException(pk);
     }
 
 
@@ -131,7 +125,6 @@ public class AdServiceImpl implements AdService {
         User user = userService.findUserByUsername(authentication);
         Ad ad = CreateOrUpdateAdMapper.INSTANCE.toModel(createOrUpdateAdDto);
         Ad newAd = adRepository.getReferenceById(pk);
-//        int currentAuthor = newAd.getUser().getId();
         String currentAuthor = newAd.getUser().getUserName();
         if (userService.checkUserRole(currentAuthor, authentication)) {
             newAd.setTitle(ad.getTitle());
@@ -262,9 +255,7 @@ public class AdServiceImpl implements AdService {
      * @param image файл
      * @return String имя загруженного файла
      */
-//    private String uploadImageOnSystem(MultipartFile image, Authentication authentication) {
     private String uploadImageOnSystem(MultipartFile image, String userName) {
-//        String userName = userServiceImpl.findUserByUsername(authentication).getUserName();
         String dir = System.getProperty("user.dir") + "/" + filePath;
         String imageName = getFileName(userName, image);
         try {

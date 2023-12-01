@@ -184,7 +184,6 @@ public class AdsController {
                                                          Authentication authentication,
                                                          @PathVariable int id) throws UnavailableException {
         return ResponseEntity.ok(adService.updateAds(properties, authentication, id));
-//        return ResponseEntity.ok(adService.updateAds(createOrUpdateAdDto, authentication, id));
     }
 
     @Operation(
@@ -279,7 +278,6 @@ public class AdsController {
                                               @RequestParam MultipartFile image) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
-//        adService.uploadImage(id, authentication, image);
         adService.uploadImage(id, authentication, image, userName );
         return ResponseEntity.ok().build();
     }

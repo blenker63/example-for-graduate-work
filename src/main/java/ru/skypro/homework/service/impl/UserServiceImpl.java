@@ -47,14 +47,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
 
-
-//
-//    @Getter
-//    @Value("${file.path.avatar}")
-//    private String filePath;
-
-
-
     /**
      * Редактирование данных пользователя
      * {@link UpdateUserMapper#toModel(UpdateUserDto, User)}
