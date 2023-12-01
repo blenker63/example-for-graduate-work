@@ -141,7 +141,9 @@ public class CommentsServiceImpl implements CommentsService {
 //        Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId);
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
-        if (checkUserRole(commentId, authentication)) {
+//        Comment comment = commentsRepository.findByPk(commentId).get();
+        String currentAuthor = comment.getUser().getUserName();
+        if (userService.checkUserRole(currentAuthor, authentication)) {
             throw new NoRightsException("нет прав для удаления");
         } else {
 //            System.out.println("удаляемый комментарий - " + comment);
@@ -172,7 +174,8 @@ public class CommentsServiceImpl implements CommentsService {
                                                   int commentId, Authentication authentication) {
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
-        if (checkUserRole(commentId, authentication)) {
+        String currentAuthor = comment.getUser().getUserName();
+        if (userService.checkUserRole(currentAuthor, authentication)) {
             throw new NoRightsException("нет прав для редактирования");
         } else {
         Comment newComment = commentsRepository.getReferenceById(comment.getPk());
@@ -182,22 +185,22 @@ public class CommentsServiceImpl implements CommentsService {
         return CreateOrUpdateCommentMapper.INSTANCE.toDto(comment);
     }
 
-    /**
-     * Проверка прав для изменения, удаления
-     *
-     * @param commentId      идентификатор комментария
-     * @param authentication аутентификация
-     *                       <p>
-     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
-     * @throws CommentNotFoundException комментарий не найден
-     */
-    private boolean checkUserRole(int commentId, Authentication authentication) {
-        User user = userService.findUserByUsername(authentication);
-        Comment comment = commentsRepository.findByPk(commentId).get();
-        String currentAuthor = comment.getUser().getUserName();
-        System.out.println("автор коммента - " + currentAuthor + "; авторизованный юзер - " + user.getId());
-        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
-    }
+//    /**
+//     * Проверка прав для изменения, удаления
+//     *
+//     * @param commentId      идентификатор комментария
+//     * @param authentication аутентификация
+//     *                       <p>
+//     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
+//     * @throws CommentNotFoundException комментарий не найден
+//     */
+//    private boolean checkUserRole(int commentId, Authentication authentication) {
+//        User user = userService.findUserByUsername(authentication);
+//        Comment comment = commentsRepository.findByPk(commentId).get();
+//        String currentAuthor = comment.getUser().getUserName();
+//        System.out.println("автор коммента - " + currentAuthor + "; авторизованный юзер - " + user.getId());
+//        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
+//    }
 
     /**
      * Метод удаления всех комментариев объявления

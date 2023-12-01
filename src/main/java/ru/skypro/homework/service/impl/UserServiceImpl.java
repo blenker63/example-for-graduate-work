@@ -13,13 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.exception.PasswordChangeException;
 import ru.skypro.homework.mapper.NewPasswordMapper;
 import ru.skypro.homework.mapper.UpdateUserMapper;
 import ru.skypro.homework.mapper.UserMapper;
+import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
+import ru.skypro.homework.repository.CommentsRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.security.MyUserPrincipal;
 import ru.skypro.homework.service.UserService;
@@ -29,6 +33,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static liquibase.repackaged.net.sf.jsqlparser.parser.feature.Feature.comment;
 
 /**
  * Класс реализация интерфейса {@link UserService} и {@link UserDetailsService}
@@ -165,5 +171,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Проверка прав для изменения, удаления
+     *
+//     * @param commentId      идентификатор комментария
+     * @param authentication аутентификация
+     *                       <p>
+     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
+     * @throws CommentNotFoundException комментарий не найден
+     */
+    public boolean checkUserRole(String  currentAuthor, Authentication authentication) {
+        User user = findUserByUsername(authentication);
+//        Comment comment = commentsRepository.findByPk(commentId).get();
+//        String currentAuthor = comment.getUser().getUserName();
+        System.out.println("автор коммента - " + currentAuthor + "; авторизованный юзер - " + user.getId());
+        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
+    }
 }
