@@ -315,17 +315,9 @@ public class AdsController {
             }
     )
     @PostMapping("/{id}/comments")
-//    @PostMapping(value = "/{id}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @PostMapping( "/{id}/comments")
     public ResponseEntity<CommentDto> addComment(Authentication authentication,
-//                                                 @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "текст комментария")
-//                                                 @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
                                                  @RequestBody CreateOrUpdateCommentDto createOrUpdateCommentDto,
                                                  @PathVariable int id) {
-//    @PostMapping("/{id}/comments")
-//    public ResponseEntity<CommentDto> addComment(@RequestBody CreateOrUpdateCommentDto createOrUpdateCommentDto,
-//                                                 @PathVariable int id,
-//                                                 Authentication authentication) {
         return ResponseEntity.ok(commentsService.addComment(createOrUpdateCommentDto, id, authentication));
     }
 
@@ -387,24 +379,13 @@ public class AdsController {
             }
     )
     @PatchMapping("/{adId}/comments/{commentId}")
-//public ResponseEntity<CreateOrUpdateCommentDto> updateComment(@RequestBody CreateOrUpdateCommentDto updateCommentDto,
-//                                                              @PathVariable int adId,
-//                                                              @PathVariable int commentId,
-//                                                              Authentication authentication) {
     public ResponseEntity<CreateOrUpdateCommentDto> updateComment(Authentication authentication,
                                                                   @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "текст комментария")
                                                                   @Valid CreateOrUpdateCommentDto createOrUpdateCommentDto,
-                                                                  @PathVariable int id,
+                                                                  @PathVariable int adId,
                                                                   @PathVariable int commentId) {
 
-        return ResponseEntity.ok(commentsService.updateComment(createOrUpdateCommentDto, id, commentId, authentication));
+        return ResponseEntity.ok(commentsService.updateComment(createOrUpdateCommentDto, adId, commentId, authentication));
     }
-//    @Configuration
-//    class WebMvcConfig implements WebMvcConfigurer {
-//        @Override
-//        public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-//            configurer.defaultContentType(MediaType.APPLICATION_OCTET_STREAM);
-//        }
-//    }
 
 }

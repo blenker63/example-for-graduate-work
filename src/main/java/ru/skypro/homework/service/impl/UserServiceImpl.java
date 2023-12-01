@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +35,7 @@ import java.nio.file.Paths;
  */
 @Service
 @AllArgsConstructor
+@EqualsAndHashCode
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
@@ -110,7 +112,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void updateImage(MultipartFile image, Authentication authentication, String userName) {
         User user = findUserByUsername(authentication);
-//        String dir = System.getProperty("user.dir") + "/" + filePath;
         String dir = System.getProperty("user.dir") + "/" + "file.path.avatar";
         try {
             Files.createDirectories(Path.of(dir));
@@ -125,15 +126,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         userRepository.save(user);
     }
-
-
-
-
-//        user.setUserImage(image.getName());
-//        log.info("изображение обновлено");
-//        return "изображение обновлено";
-//    }
-
 
     /**
      * Проверка авторизации пользователя в базе
@@ -173,4 +165,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new RuntimeException(e);
         }
     }
+
 }

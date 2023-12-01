@@ -13,6 +13,10 @@ public interface CommentsRepository extends JpaRepository<Comment, Integer> {
 
     Optional<Comment> findByPk(int id);
 
+//    Comment findByAd_PkAndPk(int adId, int commentId);
     Optional<Comment> findByAd_PkAndPk(int adId, int commentId);
-    List<Comment> findByAd_Pk(int pk);
+    Optional<Comment> findByAd(int pk);
+    Comment deleteCommentByPk(int pk);
+    Comment deleteByPk(int pk);
+
 }

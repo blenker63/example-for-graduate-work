@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bytecode.Throw;
@@ -41,6 +42,7 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 import static ru.skypro.homework.dto.Role.ADMIN;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 @Service
 @Slf4j
 public class AdServiceImpl implements AdService {
@@ -213,7 +215,6 @@ public class AdServiceImpl implements AdService {
      */
     @Override
     public void uploadImage(int pk, Authentication authentication, MultipartFile image, String userName) {
-//    public void uploadImage(int pk, Authentication authentication, MultipartFile image) {
         User user = userServiceImpl.findUserByUsername(authentication);
         Ad ad = adRepository.findByPk(pk).orElseThrow();
         if (ad == null) {
@@ -229,7 +230,6 @@ public class AdServiceImpl implements AdService {
             }
         }
         String imageName = uploadImageOnSystem(image, userName);
-//        String imageName = uploadImageOnSystem(image, user.getUserName());
         ad.setAdImage(getUrlImage(imageName));
         ad.setUser(user);
         adRepository.save(ad);
