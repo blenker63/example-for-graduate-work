@@ -33,6 +33,7 @@ import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.CommentsService;
 import ru.skypro.homework.service.UserService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -135,23 +136,15 @@ public class CommentsServiceImpl implements CommentsService {
      * @throws CommentNotFoundException комментарий не найден
      */
     @Override
-//    @Transactional
-//    @Modifying
     public void removeComment(int adId, int commentId, Authentication authentication) {
-//        Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId);
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
-//        Comment comment = commentsRepository.findByPk(commentId).get();
-        String currentAuthor = comment.getUser().getUserName();
+       String currentAuthor = comment.getUser().getUserName();
         if (userService.checkUserRole(currentAuthor, authentication)) {
-            throw new NoRightsException("нет прав для удаления");
-        } else {
-//            System.out.println("удаляемый комментарий - " + comment);
-//            System.out.println("удаляемый комментарий - " + commentsRepository.findById(commentId));
-            int comIdDel = comment.getPk();
-//            System.out.println("id удаляемого коммента  - " + comIdDel);
             commentsRepository.delete(comment);
             log.info("комментарий успешно удален");
+        } else {
+            throw new NoRightsException("нет прав для удаления");
         }
     }
 
@@ -174,33 +167,17 @@ public class CommentsServiceImpl implements CommentsService {
                                                   int commentId, Authentication authentication) {
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
+
         String currentAuthor = comment.getUser().getUserName();
         if (userService.checkUserRole(currentAuthor, authentication)) {
-            throw new NoRightsException("нет прав для редактирования");
-        } else {
         Comment newComment = commentsRepository.getReferenceById(comment.getPk());
         newComment.setText(updateCommentDto.getText());
         commentsRepository.save(newComment);
+        } else {
+            throw new NoRightsException("нет прав для редактирования");
         }
         return CreateOrUpdateCommentMapper.INSTANCE.toDto(comment);
     }
-
-//    /**
-//     * Проверка прав для изменения, удаления
-//     *
-//     * @param commentId      идентификатор комментария
-//     * @param authentication аутентификация
-//     *                       <p>
-//     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
-//     * @throws CommentNotFoundException комментарий не найден
-//     */
-//    private boolean checkUserRole(int commentId, Authentication authentication) {
-//        User user = userService.findUserByUsername(authentication);
-//        Comment comment = commentsRepository.findByPk(commentId).get();
-//        String currentAuthor = comment.getUser().getUserName();
-//        System.out.println("автор коммента - " + currentAuthor + "; авторизованный юзер - " + user.getId());
-//        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
-//    }
 
     /**
      * Метод удаления всех комментариев объявления

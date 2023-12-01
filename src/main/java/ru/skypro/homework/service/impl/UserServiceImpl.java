@@ -182,9 +182,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     public boolean checkUserRole(String  currentAuthor, Authentication authentication) {
         User user = findUserByUsername(authentication);
-//        Comment comment = commentsRepository.findByPk(commentId).get();
-//        String currentAuthor = comment.getUser().getUserName();
-        System.out.println("автор коммента - " + currentAuthor + "; авторизованный юзер - " + user.getId());
-        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
+        System.out.println("автор - " + currentAuthor + "; авторизованный юзер - " + authentication.getName());
+        return currentAuthor.equals(authentication.getName()) || user.getRole() == Role.ADMIN;
     }
 }
