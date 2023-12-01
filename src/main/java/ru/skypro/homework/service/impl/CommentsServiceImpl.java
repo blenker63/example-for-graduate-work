@@ -1,12 +1,19 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.Transient;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.exception.AdNotFoundException;
 import ru.skypro.homework.exception.CommentNotFoundException;
@@ -26,16 +33,22 @@ import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.CommentsService;
 import ru.skypro.homework.service.UserService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Класс реализация интерфейса {@link CommentsService}
  */
 @Service
+@EqualsAndHashCode
 @AllArgsConstructor
 @Slf4j
+@Scope(proxyMode = ScopedProxyMode.INTERFACES)
+@Transactional
 public class CommentsServiceImpl implements CommentsService {
     private final Logger logger = LoggerFactory.getLogger(AdServiceImpl.class);
     private final UserService userService;
@@ -80,9 +93,8 @@ public class CommentsServiceImpl implements CommentsService {
         Comment comment = new Comment();
         comment.setAd(ad);
         comment.setUser(user);
-        //comment.setText(String.valueOf(textComment));
         comment.setText(updateCommentDto.getText());
-        comment.setCreatedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli());
+        comment.setCreatedAt(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         commentsRepository.save(comment);
         log.info("комментарий успешно добавлен");
 
@@ -125,14 +137,15 @@ public class CommentsServiceImpl implements CommentsService {
      */
     @Override
     public void removeComment(int adId, int commentId, Authentication authentication) {
-        if (checkUserRole(commentId, authentication)) {
-            throw new NoRightsException("нет прав для удаления");
-        }
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
-        commentsRepository.delete(comment);
-        log.info("комментарий успешно удален");
-
+       String currentAuthor = comment.getUser().getUserName();
+        if (userService.checkUserRole(currentAuthor, authentication)) {
+            commentsRepository.delete(comment);
+            log.info("комментарий успешно удален");
+        } else {
+            throw new NoRightsException("нет прав для удаления");
+        }
     }
 
     /**
@@ -148,35 +161,22 @@ public class CommentsServiceImpl implements CommentsService {
      * @throws NoRightsException        нет прав для удаления
      * @throws CommentNotFoundException комментарий не найден
      */
+
     @Override
     public CreateOrUpdateCommentDto updateComment(CreateOrUpdateCommentDto updateCommentDto, int adId,
                                                   int commentId, Authentication authentication) {
-        if (checkUserRole(commentId, authentication)) {
-            throw new NoRightsException("нет прав для редактирования");
-        }
         Comment comment = commentsRepository.findByAd_PkAndPk(adId, commentId).
                 orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
-        comment.setText(updateCommentDto.getText());
-        commentsRepository.save(comment);
-        return CreateOrUpdateCommentMapper.INSTANCE.toDto(comment);
-    }
 
-    /**
-     * Проверка прав для изменения, удаления
-     *
-     * @param commentId      идентификатор комментария
-     * @param authentication аутентификация
-     *                       <p>
-     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
-     * @throws CommentNotFoundException комментарий не найден
-     */
-    private boolean checkUserRole(int commentId, Authentication authentication) {
-        User user = userService.findUserByUsername(authentication);
-        Comment comment = commentsRepository.findByPk(commentId).
-                orElseThrow(() -> new CommentNotFoundException("Комментарий не найден"));
         String currentAuthor = comment.getUser().getUserName();
-        return !currentAuthor.equals(authentication.getName()) || user.getRole() != Role.ADMIN;
-
+        if (userService.checkUserRole(currentAuthor, authentication)) {
+        Comment newComment = commentsRepository.getReferenceById(comment.getPk());
+        newComment.setText(updateCommentDto.getText());
+        commentsRepository.save(newComment);
+        } else {
+            throw new NoRightsException("нет прав для редактирования");
+        }
+        return CreateOrUpdateCommentMapper.INSTANCE.toDto(comment);
     }
 
     /**

@@ -12,7 +12,6 @@ uses = {NewPasswordMapper.class})
 public interface NewPasswordMapper {
     NewPasswordMapper INSTANCE = Mappers.getMapper(NewPasswordMapper.class);
     @Mapping(source = "user.password", target = "currentPassword")
-//    @Mapping(source = "user.newPassword", target = "newPassword")
     NewPasswordDto toDto(User user);
 
     @Mapping(source = "newPasswordDto.newPassword", target = "password")

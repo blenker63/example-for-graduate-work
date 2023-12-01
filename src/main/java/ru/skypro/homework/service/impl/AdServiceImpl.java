@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bytecode.Throw;
@@ -18,6 +19,7 @@ import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.dto.CreateOrUpdateAdDto;
 import ru.skypro.homework.dto.ExtendedAdDto;
 import ru.skypro.homework.exception.AdNotFoundException;
+import ru.skypro.homework.exception.NoRightsException;
 import ru.skypro.homework.exception.UserNotAdFoundException;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
@@ -26,6 +28,7 @@ import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.CommentsService;
+import ru.skypro.homework.service.UserService;
 
 import javax.servlet.UnavailableException;
 import java.io.File;
@@ -41,6 +44,7 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 import static ru.skypro.homework.dto.Role.ADMIN;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 @Service
 @Slf4j
 public class AdServiceImpl implements AdService {
@@ -48,17 +52,11 @@ public class AdServiceImpl implements AdService {
     private final AdRepository adRepository;
     private final UserRepository userRepository;
     private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final CommentsService commentsService;
 
     @Value("${file.path.image}")
     private String filePath;
-
-//    public AdServiceImpl(AdRepository adRepository, UserRepository userRepository, UserServiceImpl userServiceImpl) {
-//        this.adRepository = adRepository;
-//        this.userRepository = userRepository;
-//        this.userServiceImpl = userServiceImpl;
-//
-//    }
 
 
     /**
@@ -74,14 +72,13 @@ public class AdServiceImpl implements AdService {
                         MultipartFile image,
                         Authentication authentication,
                         String userName) {
-        User user = userServiceImpl.findUserByUsername(authentication);
+        User user = userService.findUserByUsername(authentication);
         Ad ad = CreateOrUpdateAdMapper.INSTANCE.toModel(createOrUpdateAdDto);
         String imageName = uploadImageOnSystem(image, userName);
         ad.setUser(user);
         ad.setAdImage(getUrlImage(imageName));
         adRepository.save(ad);
         logger.info("добавлено новое объявление: " + ad);
-//        return CreateOrUpdateAdMapper.INSTANCE.toDto(ad, user);
         return AdMapper.INSTANCE.toDto(ad, user);
     }
 
@@ -112,12 +109,6 @@ public class AdServiceImpl implements AdService {
         User user = userRepository.findById(ad.getUser().getId());
         logger.info("найдено объявление: " + ad, ad);
         return ExtendedAdMapper.INSTANCE.toDto(ad, user);
-//        if (ad != null) {
-//            User user = userRepository.findById(adRepository.findByPk(pk).getUser().getId());
-//            logger.info("найдено объявление: " + ad, ad);
-//            return ExtendedAdMapper.INSTANCE.toDto(ad, user);
-//        }
-//        throw new AdNotFoundException(pk);
     }
 
 
@@ -131,24 +122,21 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public CreateOrUpdateAdDto updateAds(CreateOrUpdateAdDto createOrUpdateAdDto, Authentication authentication, int pk) throws UnavailableException {
-        User user = userServiceImpl.findUserByUsername(authentication);
+        User user = userService.findUserByUsername(authentication);
         Ad ad = CreateOrUpdateAdMapper.INSTANCE.toModel(createOrUpdateAdDto);
         Ad newAd = adRepository.getReferenceById(pk);
-        if (ad == null) {
-            logger.warn("не найдено объявление id =" + pk);
-            throw new AdNotFoundException(pk);
+        String currentAuthor = newAd.getUser().getUserName();
+        if (userService.checkUserRole(currentAuthor, authentication)) {
+            newAd.setTitle(ad.getTitle());
+            newAd.setPrice(ad.getPrice());
+            newAd.setDescription(ad.getDescription());
+            logger.info("внесены изменения в объявление id =" + ad.getPk(), ad);
+            adRepository.save(newAd);
+        } else {
+
+            throw new NoRightsException("нет прав для изменений");
         }
-//        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
-        newAd.setTitle(ad.getTitle());
-        newAd.setPrice(ad.getPrice());
-        newAd.setDescription(ad.getDescription());
-        logger.info("внесены изменения в объявление id =" + ad.getPk(), ad);
-        adRepository.save(newAd);
-        return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
-//        } else {
-//            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
-//            throw new UnavailableException(user.getFirstName(), user.getId());
-//        }
+            return CreateOrUpdateAdMapper.INSTANCE.toDto(newAd, user);
     }
 
     /**
@@ -180,28 +168,24 @@ public class AdServiceImpl implements AdService {
      */
     @Override
     public void removeAd(int pk, Authentication authentication) throws UnavailableException {
-        User user = userServiceImpl.findUserByUsername(authentication);
         Ad ad = adRepository.findByPk(pk).orElseThrow(() -> new AdNotFoundException(pk));
-//        if (ad == null) {
-//            logger.warn("объявление id =" + pk + " не найдено");
-//            throw new AdNotFoundException(pk);
-//        }
-        if (user.getRole().equals(ADMIN) || ad.getUser().getId() == user.getId()) {
-            if (ad.getAdImage() != null) {
-                try {
-
-                    Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath
-                            + ad.getAdImage().replaceAll("/ads/get", "")));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            Ad newAd = adRepository.getReferenceById(pk);
+            String currentAuthor = newAd.getUser().getUserName();
+            if (userService.checkUserRole(currentAuthor, authentication)) {
+                if (ad.getAdImage() != null) {
+                    try {
+                        Files.delete(Path.of(System.getProperty("user.dir") + "/" + filePath
+                                + ad.getAdImage().replaceAll("/ads/get", "")));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-            commentsService.deleteAllCommentByPk(pk);
-            adRepository.delete(ad);
-            logger.info("удалено объявление id = " + pk);
-        } else {
-            logger.warn("у пользователя " + user.getId() + " не достаточно прав для удаления объявления id = " + ad.getPk(), ad);
-            throw new UnavailableException(user.getFirstName(), user.getId());
+                commentsService.deleteAllCommentByPk(pk);
+                adRepository.delete(ad);
+                logger.info("удалено объявление id = " + pk);
+
+            } else {
+                throw new NoRightsException("нет прав для удаления");
         }
     }
 
@@ -213,7 +197,6 @@ public class AdServiceImpl implements AdService {
      */
     @Override
     public void uploadImage(int pk, Authentication authentication, MultipartFile image, String userName) {
-//    public void uploadImage(int pk, Authentication authentication, MultipartFile image) {
         User user = userServiceImpl.findUserByUsername(authentication);
         Ad ad = adRepository.findByPk(pk).orElseThrow();
         if (ad == null) {
@@ -229,7 +212,6 @@ public class AdServiceImpl implements AdService {
             }
         }
         String imageName = uploadImageOnSystem(image, userName);
-//        String imageName = uploadImageOnSystem(image, user.getUserName());
         ad.setAdImage(getUrlImage(imageName));
         ad.setUser(user);
         adRepository.save(ad);
@@ -273,9 +255,7 @@ public class AdServiceImpl implements AdService {
      * @param image файл
      * @return String имя загруженного файла
      */
-//    private String uploadImageOnSystem(MultipartFile image, Authentication authentication) {
     private String uploadImageOnSystem(MultipartFile image, String userName) {
-//        String userName = userServiceImpl.findUserByUsername(authentication).getUserName();
         String dir = System.getProperty("user.dir") + "/" + filePath;
         String imageName = getFileName(userName, image);
         try {

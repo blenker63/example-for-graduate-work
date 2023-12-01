@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,13 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.exception.PasswordChangeException;
 import ru.skypro.homework.mapper.NewPasswordMapper;
 import ru.skypro.homework.mapper.UpdateUserMapper;
 import ru.skypro.homework.mapper.UserMapper;
+import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
+import ru.skypro.homework.repository.CommentsRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.security.MyUserPrincipal;
 import ru.skypro.homework.service.UserService;
@@ -29,23 +34,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static liquibase.repackaged.net.sf.jsqlparser.parser.feature.Feature.comment;
+
 /**
  * Класс реализация интерфейса {@link UserService} и {@link UserDetailsService}
  */
 @Service
 @AllArgsConstructor
+@EqualsAndHashCode
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-
-
-//
-//    @Getter
-//    @Value("${file.path.avatar}")
-//    private String filePath;
-
-
 
     /**
      * Редактирование данных пользователя
@@ -110,7 +110,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void updateImage(MultipartFile image, Authentication authentication, String userName) {
         User user = findUserByUsername(authentication);
-//        String dir = System.getProperty("user.dir") + "/" + filePath;
         String dir = System.getProperty("user.dir") + "/" + "file.path.avatar";
         try {
             Files.createDirectories(Path.of(dir));
@@ -125,15 +124,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         userRepository.save(user);
     }
-
-
-
-
-//        user.setUserImage(image.getName());
-//        log.info("изображение обновлено");
-//        return "изображение обновлено";
-//    }
-
 
     /**
      * Проверка авторизации пользователя в базе
@@ -172,5 +162,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             log.error("ошибка в названии image Аватара" + filename);
             throw new RuntimeException(e);
         }
+    }
+    /**
+     * Проверка прав для изменения, удаления
+     *
+//     * @param commentId      идентификатор комментария
+     * @param authentication аутентификация
+     *                       <p>
+     *                       {@link CommentsRepository#findByPk(int)} поиск комментария
+     * @throws CommentNotFoundException комментарий не найден
+     */
+    public boolean checkUserRole(String  currentAuthor, Authentication authentication) {
+        User user = findUserByUsername(authentication);
+        System.out.println("автор - " + currentAuthor + "; авторизованный юзер - " + authentication.getName());
+        return currentAuthor.equals(authentication.getName()) || user.getRole() == Role.ADMIN;
     }
 }
