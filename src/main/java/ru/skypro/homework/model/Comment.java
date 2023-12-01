@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.time.LocalDateTime;
+
 import static liquibase.repackaged.net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 @Entity
@@ -18,7 +20,8 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne (cascade = CascadeType.REMOVE)
+//    @Transient
+    @ManyToOne
     @JoinColumn(name = "ad_id")
     private Ad ad;
     private long createdAt;
@@ -26,4 +29,5 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pk;
     private String text;
+
 }
