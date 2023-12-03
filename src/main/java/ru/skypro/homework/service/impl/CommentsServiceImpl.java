@@ -52,7 +52,6 @@ import java.util.List;
 public class CommentsServiceImpl implements CommentsService {
     private final Logger logger = LoggerFactory.getLogger(AdServiceImpl.class);
     private final UserService userService;
-    //    private final AdService adService;
     private final AdRepository adRepository;
     private final CommentsRepository commentsRepository;
 
