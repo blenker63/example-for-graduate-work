@@ -14,9 +14,7 @@
 - Показ и сохранение картинок объявлений, а также аватарок пользователей;
 
 Инструменты, используемые в проекте:
-
 Backend:
-
 Java 11
 Maven
 Spring Boot
@@ -28,12 +26,12 @@ REST
 Swagger
 Lombok
 Stream API
-SQL:
 
+SQL:
 Spring JPA
 Liquibase
-Test:
 
+Test:
 Junit
 Mockito
 Frontend:
