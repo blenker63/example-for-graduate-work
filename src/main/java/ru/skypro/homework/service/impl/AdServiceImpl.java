@@ -55,6 +55,12 @@ public class AdServiceImpl implements AdService {
     private final UserService userService;
     private final CommentsService commentsService;
 
+//    private final AdsMapper adsMapper;
+//    public AdServiceImpl(AdsMapper adsMapper) {
+//        this.adsMapper = adsMapper;
+//    }
+
+
     @Value("${file.path.image}")
     private String filePath;
 
@@ -93,6 +99,7 @@ public class AdServiceImpl implements AdService {
         AdsDto adsDto = new AdsDto();
         adsDto.setCount(adList.size());
         adsDto.setResults(AdsMapper.INSTANCE.toDto(adList));
+//        adsDto.setResults(AdsMapper.toDto(adList));
         logger.warn("выведены все объявления");
         return adsDto;
     }
@@ -154,6 +161,7 @@ public class AdServiceImpl implements AdService {
         } else {
             adsDto.setCount(adMeList.size());
             adsDto.setResults(AdsMapper.INSTANCE.toDto(adMeList));
+//            adsDto.setResults(AdsMapper.toDto(adMeList));
             logger.warn("выведены объявления авторизованного пользователя c id " + user.getId());
         }
         return adsDto;

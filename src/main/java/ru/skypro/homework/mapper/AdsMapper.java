@@ -17,5 +17,6 @@ public interface AdsMapper {
     AdDto toDtoAd(Ad ad);
 
     @Mapping(target = "author", source = "user.id")
-    List<AdDto> toDto(List<Ad> adMeList);
+     List<AdDto> toDto(List<Ad> adMeList);
+
 }
