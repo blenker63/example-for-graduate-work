@@ -2,7 +2,9 @@ package ru.skypro.homework.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -46,6 +48,8 @@ import static liquibase.repackaged.net.sf.jsqlparser.parser.feature.Feature.comm
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+
+
 
     /**
      * Редактирование данных пользователя
@@ -110,7 +114,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void updateImage(MultipartFile image, Authentication authentication, String userName) {
         User user = findUserByUsername(authentication);
-        String dir = System.getProperty("user.dir") + "/" + "file.path.avatar";
+        String dir = System.getProperty("user.dir") + "/" + "avatars";
         try {
             Files.createDirectories(Path.of(dir));
             String fileName = String.format("avatar%s.%s", user.getEmail(),
@@ -156,8 +160,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public byte[] getUserImage(String filename) {
         try {
-            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + "file.path.avatar" + "/" + filename));
-//            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + getFilePath() + "/" + filename));
+            return Files.readAllBytes(Paths.get(System.getProperty("user.dir")
+                    + "/"
+                    + "avatars"
+                    + "/"
+                    + filename));
         } catch (IOException e) {
             log.error("ошибка в названии image Аватара" + filename);
             throw new RuntimeException(e);
@@ -166,7 +173,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Проверка прав для изменения, удаления
      *
-//     * @param commentId      идентификатор комментария
      * @param authentication аутентификация
      *                       <p>
      *                       {@link CommentsRepository#findByPk(int)} поиск комментария
@@ -174,7 +180,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     public boolean checkUserRole(String  currentAuthor, Authentication authentication) {
         User user = findUserByUsername(authentication);
-        System.out.println("автор - " + currentAuthor + "; авторизованный юзер - " + authentication.getName());
         return currentAuthor.equals(authentication.getName()) || user.getRole() == Role.ADMIN;
     }
 }

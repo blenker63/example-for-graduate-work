@@ -24,6 +24,7 @@ public class Ad {
     private int price;
     private String title;
     private String description;
+    @Transient
     private int countComment;
     @Transient
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "ad", orphanRemoval = true)
