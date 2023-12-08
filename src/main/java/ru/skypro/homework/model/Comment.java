@@ -20,7 +20,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-//    @Transient
     @ManyToOne
     @JoinColumn(name = "ad_id")
     private Ad ad;
