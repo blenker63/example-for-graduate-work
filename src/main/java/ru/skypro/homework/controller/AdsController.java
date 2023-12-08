@@ -32,8 +32,6 @@ import javax.validation.Valid;
 @Tag(name = "Объявления", description = "контроллер для работы с объявлениями")
 @RestController
 @JsonIgnoreProperties(ignoreUnknown = true)
-//@AllArgsConstructor
-//@RequiredArgsConstructor
 @RequestMapping("/ads")
 public class AdsController {
     private final AdService adService;
@@ -283,7 +281,10 @@ public class AdsController {
     }
 
 
-    @GetMapping(value = "/get/{filename}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/*"})
+    @GetMapping(value = "/get/{filename}", produces = {MediaType.IMAGE_PNG_VALUE,
+            MediaType.IMAGE_JPEG_VALUE,
+            MediaType.IMAGE_GIF_VALUE,
+            "image/*"})
     public ResponseEntity<byte[]> serveFile(@PathVariable String filename) {
         return ResponseEntity.ok().body(adService.getAdImage(filename));
     }

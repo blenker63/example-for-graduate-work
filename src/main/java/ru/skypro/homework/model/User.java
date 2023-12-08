@@ -34,6 +34,7 @@ public class User  {
     private String userImage;
     private String userName;
     private String password;
+    @Transient
     private int countAd;
     @Transient
     @OneToMany(mappedBy = "user")

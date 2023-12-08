@@ -55,11 +55,6 @@ public class AdServiceImpl implements AdService {
     private final UserService userService;
     private final CommentsService commentsService;
 
-//    private final AdsMapper adsMapper;
-//    public AdServiceImpl(AdsMapper adsMapper) {
-//        this.adsMapper = adsMapper;
-//    }
-
 
     @Value("${file.path.image}")
     private String filePath;
@@ -287,7 +282,12 @@ public class AdServiceImpl implements AdService {
     @Override
     public byte[] getAdImage(String filename) {
         try {
-            return Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/" + filePath + "/" + filename));
+            return Files.readAllBytes(Paths.get(System.getProperty("user.dir")
+                    + "/"
+                    + filePath
+//                    + "images"
+                    + "/"
+                    + filename));
         } catch (IOException e) {
             logger.error("ошибка в названии image объявления " + filename);
             throw new RuntimeException(e);
